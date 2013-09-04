@@ -7,3 +7,4 @@ from collection import *
 from subject import *
 from toydb import *
 from mongodb import *
+from kafka_stream import *
