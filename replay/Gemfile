@@ -1,0 +1,6 @@
+source 'http://rubygems.org'
+
+gem 'mongo'
+gem 'poseidon', :git =>"git@github.com:bpot/poseidon.git"
+gem 'bson_ext'
+gem 'pry'

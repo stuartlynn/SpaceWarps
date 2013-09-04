@@ -1,0 +1,30 @@
+GIT
+  remote: git@github.com:bpot/poseidon.git
+  revision: 8be3e7f1e99c880a513760e8fda0ca6c135352d6
+  specs:
+    poseidon (0.0.1)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    bson (1.9.2)
+    bson_ext (1.9.2)
+      bson (~> 1.9.2)
+    coderay (1.0.9)
+    method_source (0.8.2)
+    mongo (1.9.2)
+      bson (~> 1.9.2)
+    pry (0.9.12.2)
+      coderay (~> 1.0.5)
+      method_source (~> 0.8)
+      slop (~> 3.4)
+    slop (3.4.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bson_ext
+  mongo
+  poseidon!
+  pry
