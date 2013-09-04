@@ -193,10 +193,16 @@ def SWAP(argv):
     
         db = swap.MongoDB()
 
+    
+
     # Read in a batch of classifications, made since the aforementioned 
     # start time:
 
-    batch = db.find('since',t1)
+    if True:      
+        batch = swap.kafka_stream()
+        batch.set_offset(10)
+    else:
+        batch = db.find('since',t1)
         
     # Actually, batch is a cursor, now set to the first classification 
     # after time t1.
@@ -208,10 +214,18 @@ def SWAP(argv):
     if one_by_one: print "SWAP: (one by one - hit return for the next one)"
 
     count = 0
-    for classification in batch:
 
+   
+    # for classification in batch:
+    while True:
+        
+        classification = batch.next()
+        if len(classification) == 0:
+            break
         # Get the vitals for this classification:
-        items = db.digest(classification,method=use_marker_positions)
+        items = batch.digest(classification,method=use_marker_positions)
+       
+
         if items is None: 
             continue # Tutorial subjects fail!
         t,Name,ID,ZooID,category,kind,X,Y,location = items
@@ -411,10 +425,10 @@ def SWAP(argv):
             sample.member[ID].plot_trajectory(fig3)
 
         # These are false negatives and true positives
-        for ID in sample.shortlist(15,kind='sim',status='rejected'):
-            sample.member[ID].plot_trajectory(fig3)
-        for ID in sample.shortlist(15,kind='sim',status='detected'):
-            sample.member[ID].plot_trajectory(fig3)
+        # for ID in sample.shortlist(15,kind='sim',status='rejected'):
+        #     sample.member[ID].plot_trajectory(fig3)
+        # for ID in sample.shortlist(15,kind='sim',status='detected'):
+        #     sample.member[ID].plot_trajectory(fig3)
 
         # Aprajita's false negative only plot:
         # for ID in sample.shortlist(Ns,kind='sim',status='rejected'):
