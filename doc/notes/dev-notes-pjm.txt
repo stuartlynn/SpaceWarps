@@ -1,48 +1,48 @@
 # ============================================================================
 # 2013-07-16 (Tuesday) 09:42 PDT
-# 
+#
 # Reconfiguring SW website for CFHTLS stage 2. Need to run the site locally, to
-# check appearance, performance etc. 
-# 
+# check appearance, performance etc.
+#
 # Follow Amit's instructions:
 #
-#     The readme should get you going. You need to install Node. 
+#     The readme should get you going. You need to install Node.
 #     Then from the project root directory, run
-# 
+#
 #     npm install
 #     hem server --includeCss
 
 # Here's the contents of the README.md:
 
 #     ## Setting up
-# 
+#
 #         git clone git@github.com:zooniverse/Lens-Zoo.git
 #         npm install .
-# 
+#
 #     ## Starting local server
-# 
+#
 #         hem server --includeCss
-# 
+#
 #     ## Building subjects
-# 
+#
 #         cd /path/to/ouroboros
 #         rails r /path/to/spacewarps/data-import/builder.rb
-# 
+#
 #     or to build against staging server
-# 
+#
 #         RAILS_ENV=staging rails r /path/to/spacewarps/data-import/builder.rb
 #         ssh ubuntu@dev.zooniverse.org
-#         cd /rails/apps/ouroboros_staging/current
+#         cd /rails/apps/ouroboros/current
 #         sudo -u www-data bundle exec rails c staging
-# 
+#
 #         # Clear the redis cache
 #         SpacewarpSubject.redis_set.destroy
-# 
+#
 #         # Activate subjects
 #         SpacewarpGroup.activate
-# 
+#
 #     ## Building and deploying project
-# 
+#
 #         ./build.rb
 
 
@@ -52,7 +52,7 @@
 #   brew update
 
 # to get the latest version of node and npm. [I got homebrew some time ago,
-# with:  ruby ~/software/homebrew.rb after downloading homebrew.rb from the 
+# with:  ruby ~/software/homebrew.rb after downloading homebrew.rb from the
 # homebrew website.]
 
 # Now run the node install command:
@@ -82,7 +82,7 @@ npm install .
 # ├── jade@0.33.0 (character-parser@1.0.2, mkdirp@0.3.5, commander@1.2.0, monocle@0.1.48, with@1.1.0, constantinople@1.0.1, transformers@2.0.1)
 # └── testacular@0.4.0 (xmlbuilder@0.4.2, chokidar@0.6.2, glob@3.2.3, minimatch@0.2.12, socket.io@0.9.16)
 
-# Done. This makes a directory called "node_modules". To do a hard reinstall, 
+# Done. This makes a directory called "node_modules". To do a hard reinstall,
 # \rm -rf this directory and redo the npm install .
 
 
@@ -105,14 +105,14 @@ hem server --includeCss &
 
    # # Now - do we need to do the ouruboros stuff? Or can we just build?
    # # Try it:
-   # 
+   #
    # ./build.rb
 
    # ./build.rb:5: syntax error, unexpected ':', expecting $end
    # AWS.config access_key_id: ENV['S3_ACCESS_ID'], secret_a...
 
    # Looks like ruby script is expecting some Amazon passwords or something.
-   # Do we need this? Or can we run even more locally somehow, just for 
+   # Do we need this? Or can we run even more locally somehow, just for
    # site testing?
 
 # Actually the build is not needed. All we need to do is point a browser at
@@ -131,8 +131,8 @@ open http://0.0.0.0:9294/
 # Or, one branch per survey, and keep separate files for stages?
 #   This latter one has nice features: lots of PNG files needed for website
 #   could be kept in separate branches. Stage 2 edits are minor, in principle
-#   - so could be handled by 
-# 
+#   - so could be handled by
+#
 # Plan:
 #
 # * Fork Lens-Zoo repo to drphilmarshall              DONE
@@ -159,87 +159,87 @@ open http://0.0.0.0:9294/
 #     * Submit pull request
 #
 # ---------------------------------------------------------------
-# B) Amit: since Sci Team changes are purely content, just change switches 
+# B) Amit: since Sci Team changes are purely content, just change switches
 #    in index.coffee to point at different content!
-# 
+#
 #    https://github.com/zooniverse/Lens-Zoo/blob/master/app/index.coffee
 #
 #    Need to learn how to do this...
 #
 # ---------------------------------------------------------------
-# 
+#
 # Required differences between Stage 1 and Stage 2:
 #
 # stage1.html, stage2.html with different spotters guides, labels etc.
 # Different instant feedback... Different tutorial? Single pop-up? Doesn't
 # have to be on particular image, can just come up on first visit to Stage 2.
-# 
+#
 # Needs discussion.
 #
 # ---------------------------------------------------------------
-# 
+#
 # What about different projects in different branches?
 #
-# Potentially dangerous, if merging is not handled well... 
-# Better to just flick switch in index.coffee in Amit's scheme. 
-# 
+# Potentially dangerous, if merging is not handled well...
+# Better to just flick switch in index.coffee in Amit's scheme.
+#
 # ie instead of having index.html, use CFHTLS.html, DES.html etc for content,
 # and put images in
-# 
+#
 # images/CFHTLS/guide, images/CFHTLS/tutorial
-# 
+#
 # instead of images/guide/images/tutorial, etc.
 #
 # ---------------------------------------------------------------
 # Notes on git:
-# 
-# - Local master branch is to be kept a clean copy of the remote Zooniverse 
+#
+# - Local master branch is to be kept a clean copy of the remote Zooniverse
 #   Lens-Zoo repo. Pull in Amit's edits using:
-#   
-# 
-#   git checkout master   
+#
+#
+#   git checkout master
 #    (to move to the master branch of drphilmarshall/Lens-Zoo)
-# 
+#
 #   git remote add upstream https://github.com/zooniverse/Lens-Zoo.git
 #    (to connect yourself to the zooniverse version of the repo)
-# 
+#
 #   git fetch upstream
 #    (to get any new changes that Amit made, from zooniverse/Lens-Zoo)
-# 
+#
 #   git merge upstream/master
 #    (to merge in these new changes)
-# 
-# 
+#
+#
 #   git checkout dev
 #        (to return to your local dev branch)
 #
 #   git merge master
 #        (to merge in changes from the master branch)
-# 
+#
 #   git push origin dev
 #        (to push committed changes in your local dev branch to the dev branch at https://github.com/drphilmarshall/Lens-Zoo)
-# 
 #
-# - Learn more about branches here:    
+#
+# - Learn more about branches here:
 #     http://git-scm.com/book/en/Git-Branching-Remote-Branches
-#   
+#
 # ============================================================================
 # 2013-07-18 (Thursday) 13:43 PDT
 
-# It would be nice to split the Spotter's Guide into a separate file? Hmm. 
+# It would be nice to split the Spotter's Guide into a separate file? Hmm.
 # Not sure how to do this yet, For now, just add a gallery.
 
 # Copied images into gallery directory, and wrote shell script to write html
-# snippet, which can then be pasted into the stage2 index.html file. Script 
+# snippet, which can then be pasted into the stage2 index.html file. Script
 # lives in bin. First go: all lens images go in one single gallery, can change
-# this later. Same for false positive gallery? Might as well. 
+# this later. Same for false positive gallery? Might as well.
 
 # ============================================================================
 # 2013-08-16 (Friday) 18:06 PDT
 
 # OK, Amit did the splitting, for translatability. Updated reconfigure.csh
 # to make copies of the stage 1 and stage 2 files we need:
-# 
+#
 # set files = ( \
 # app/translations/en_us.coffee \
 # app/views/home.eco \
@@ -297,15 +297,15 @@ bin/reconfigure.csh CFHTLS 1
 
 # First edits - to the about page. Added the following to
 # about_CFHTLS_stage2.eco:
-# 
+#
 #     <%- translate 'h2', 'about.searching' %>
 #     <%- translate 'p', 'about.searching_text' %>
-    
+
 # ============================================================================
 # 2013-10-28 (Monday) 11:36 PDT
 
 # Visiting Zooniverse, working on reconfiguring for stage 2 following
-# Aprajita's orange push :-) 
+# Aprajita's orange push :-)
 
 # Starting server...
 
@@ -314,7 +314,7 @@ hem server --includeCss &
 
 # Good - needed Brian's help to get zootorial updates cleanly, by editing
 # package.json to read:
-# 
+#
 #     "zootorial": "~0.3.0",
 
 # OK, orange looks cool. Heath (designer) suggested going a little darker, and
@@ -335,8 +335,8 @@ hem server --includeCss &
 # ============================================================================
 # 2013-11-01 (Friday) 22:16 PDT
 
-# Chris is about to do a bunch of editing to make the site translatable - 
-# several scripts will change. Try an alternative way of reconfiguring: 
+# Chris is about to do a bunch of editing to make the site translatable -
+# several scripts will change. Try an alternative way of reconfiguring:
 # one branch per configuration.
 
 # Cloned a fresh repo in to Lens-Zoo:
@@ -370,9 +370,9 @@ foreach file ( $files )
   set ext = $file:e
   set target = ../Dev/projects/CFHTLS/${stem}_CFHTLS_stage$k.${ext}
   echo "cp $target $file"
-end  
-  
-# Also need other new styl files:  
+end
+
+# Also need other new styl files:
 
 set stylfiles = (\
 css/common.styl \
@@ -384,7 +384,7 @@ css/profile.styl \
 foreach file ( $stylfiles )
   set target = ../Dev/$file
   echo "cp $target $file"
-end  
+end
 
 # OK, this branch is now the same as master except for the styl files have
 # changed to handle color better. Could merge into master at this point and
@@ -401,7 +401,7 @@ foreach file ( $files )
   set ext = $file:e
   set target = ../Dev/projects/CFHTLS/${stem}_CFHTLS_stage$k.${ext}
   echo "cp $target $file"
-end  
+end
 
 git status
 # On branch CFHTLS_stage2
@@ -417,17 +417,17 @@ git status
 
 # OK, this looks right - oh, except translation file! Needs to be done
 # separetly, because its not stage-dependent.
-  
+
 # Done. This system should allow for an easy merge of Chris's edits.
-# The danger is that we might merge the wrong way at some point, and 
-# end up over-writing some of the historical CFHTLS_stage1 record, for 
+# The danger is that we might merge the wrong way at some point, and
+# end up over-writing some of the historical CFHTLS_stage1 record, for
 # example. Maybe the reconfigure script could be used to do the merging
 # safely? In the branch method, we reconfigure the site using git checkout.
-# And we bring in changes from Adler with a looped merge, going through 
-# all the configurations' branches. 
+# And we bring in changes from Adler with a looped merge, going through
+# all the configurations' branches.
 
 # 2013-11-05 (Tuesday) 22:08 PST
- 
+
 # OK, merged in changes from translations branch. Here's what I did:
 
 
@@ -449,14 +449,14 @@ nedit app/translations/en_us.coffee
 git add app/translations/en_us.coffee
 git commit -am "Merged in translations"
 
-# OK! Now I pulled in the dev branch again, to start thinking about how to 
+# OK! Now I pulled in the dev branch again, to start thinking about how to
 # do the archiving of teh various files - this is for convenience, so we can
 # look at the various different versions without changing branch...
 
 git checkout master
 git pull origin dev
 # This was a mistake - I should have made a dev branch first, and then pulled
-# into *that*. Here's how to recover, and make the master branch match the 
+# into *that*. Here's how to recover, and make the master branch match the
 # remote version:
 git reset --hard origin/master
 # Carry on:
@@ -477,7 +477,7 @@ git push origin translations
 
 
 # Notes:
-# * If we use branches like this to reconfigure the site, we may still want a 
+# * If we use branches like this to reconfigure the site, we may still want a
 #   reconfigure script to repeat the above sequence or something like it.
 # * Have to remember to create branches and then pull into them!
 # * Script might have a role in propagating edits across all stages?
@@ -485,15 +485,15 @@ git push origin translations
 #   translations... Need to work in CFHTLS_stage2 branch now, and archive
 #   into projects folder later...
 # * New app does not run, throwing error:
-# 
+#
 # { [Error: ENOENT, no such file or directory './app/lib/jquery.js']
 #   errno: 34,
 #   code: 'ENOENT',
 #   path: './app/lib/jquery.js',
 #   syscall: 'open' }
-# 
+#
 #   Need to use new run script?
-#   
+#
 # Error on starting app:
 
 npm install .
@@ -504,7 +504,7 @@ npm run-script start
 
 # > spacewarps@0.0.1 start /Users/pjm/public_html/SpaceWarps/Dev
 # > hem server --includeCss
-# 
+#
 # events.js:66
 #         throw arguments[1]; // Unhandled 'error' event
 #                        ^
@@ -514,7 +514,7 @@ npm run-script start
 #     at process.startup.processNextTick.process._tickCallback (node.js:244:9)
 # npm ERR! spacewarps@0.0.1 start: `hem server --includeCss`
 # npm ERR! `sh "-c" "hem server --includeCss"` failed with 1
-# npm ERR! 
+# npm ERR!
 # npm ERR! Failed at the spacewarps@0.0.1 start script.
 # npm ERR! This is most likely a problem with the spacewarps package,
 # npm ERR! not with npm itself.
@@ -523,7 +523,7 @@ npm run-script start
 # npm ERR! You can get their info via:
 # npm ERR!     npm owner ls spacewarps
 # npm ERR! There is likely additional logging output above.
-# 
+#
 # npm ERR! System Darwin 10.8.0
 # npm ERR! command "node" "/usr/local/bin/npm" "run-script" "start"
 # npm ERR! cwd /Users/pjm/public_html/SpaceWarps/Dev
@@ -532,7 +532,7 @@ npm run-script start
 # npm ERR! code ELIFECYCLE
 # npm ERR! message spacewarps@0.0.1 start: `hem server --includeCss`
 # npm ERR! message `sh "-c" "hem server --includeCss"` failed with 1
-# npm ERR! 
+# npm ERR!
 # npm ERR! Additional logging details can be found in:
 # npm ERR!     /Users/pjm/public_html/SpaceWarps/Dev/npm-debug.log
 # npm ERR! not ok code 0
@@ -541,7 +541,7 @@ npm run-script start
 
 # 2013-11-06 (Wednesday) 10:07 PST
 
-# He can! Apparently the issue is I am running another server... Need to 
+# He can! Apparently the issue is I am running another server... Need to
 # kill that one first.
 
 ps -e | grep hem
@@ -556,13 +556,13 @@ npm run-script start
 
 # Missing zooniverse language library - console error is:
 #
-#     Uncaught module 'zooniverse/lib/language-manager' not found 
+#     Uncaught module 'zooniverse/lib/language-manager' not found
 
 # Talk to Chris....
 
 
 
-# Adding in new stage 2 feedback messages, from google spreadsheet 
+# Adding in new stage 2 feedback messages, from google spreadsheet
 # "stage2_fp_detailed_feedback" at:
 #
 # https://docs.google.com/spreadsheet/ccc?key=0AgJSOgFpShAsdHlfbVlvTE1SdVFYSWkwQXlVRGQ5NFE&usp=drive_web#gid=0
@@ -591,7 +591,7 @@ end
 # Note the usefulness of the '%' signs in the column, for helping in slicing
 # up the messages from teh comments etc. The issue is that the messages
 # can contain commas, so need quotes (sometimes), and that we can't then cut
-# on commas. 
+# on commas.
 
 head $output
 #       CFHTLS_stage2_fps:
@@ -609,7 +609,7 @@ head $output
 
 # OK, pasted the messages into the en_us.coffee file, in the feedback section!
 
-# Now trying to add new feedback generators for false positives, in 
+# Now trying to add new feedback generators for false positives, in
 #   app/lib/create_feedback.coffee
 # called from:
 #   app/lib/controllers/classifier.coffee
@@ -617,16 +617,16 @@ head $output
 #   app/translations/en_us.coffee
 
 # App fails to run, with console error:
-# 
+#
 # SyntaxError: unexpected TERMINATOR application.js:1
 # Uncaught ReferenceError: require is not defined (index):51
 # (anonymous function)
-# 
+#
 # I guess the second line is a consequence of the first... So we have a
 # syntax error. How to trace this sort of thing?!
 
-  
-# Meanwhile, reconfigure is working again. 
+
+# Meanwhile, reconfigure is working again.
 # For Aprajita to work on the guide, she should:
 
 git checkout dev
@@ -668,7 +668,7 @@ npm run-script start
 # That doesn't work either! Still failing to require index...
 
 # Go back to translations branch. What are the packages it needs?
-more package.json 
+more package.json
 # {
 #   "name": "spacewarps",
 #   "version": "0.0.1",
@@ -692,7 +692,7 @@ more package.json
 # }
 
 # npm install . fails on this:
-# 
+#
 # npm ERR! git checkout language-menu error: pathspec 'language-menu' did not match any file(s) known to git.
 # npm ERR! Error: `git "checkout" "language-menu"` failed with 1
 # npm ERR!     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/exec.js:56:20)
@@ -722,19 +722,19 @@ npm install .
 npm install .
 # npm ERR! git checkout language-menu error: pathspec 'language-menu' did not match any file(s) known to git.
 # npm ERR! Error: `git "checkout" "language-menu"` failed with 1
-# npm ERR!     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/exec.js:56:20) 
+# npm ERR!     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/exec.js:56:20)
 
 # Hmm - no working package.json files at all?!
 
-# Nope - language-menu and new-features both seem to be broken :-( 
+# Nope - language-menu and new-features both seem to be broken :-(
 # Issue this. New features more of a problem perhaps? Try reverting to 0.3.4
 
-# OK, app runs with 
-# 
+# OK, app runs with
+#
 #     "zootorial": "~0.3.4",
 #     "zooniverse": "git://github.com/zooniverse/Zooniverse#no-deps",
 
-# But I still get the console error, 
+# But I still get the console error,
 
 # SynTax Error: unexpected TERMINATOR   application.js:1
 # Uncaught ReferenceError: require is not defined (index:51)
@@ -760,22 +760,22 @@ npm run-script start &
 # -> shift refresh browser.
 
 # No - still getting require error. When I do all this in a fresh clone of
-# the Lens-Zoo repo though, I get a working app. So, something has gotten 
+# the Lens-Zoo repo though, I get a working app. So, something has gotten
 # screwed up in merging the Lens-Zoo repo with ours.
 
-# Look for differences between files in drphilmarshall/translations and 
+# Look for differences between files in drphilmarshall/translations and
 # zooniverse/translations...
 
 set files = ( *.* public/index.html css/*.* app/*.* app/*/*.* )
 foreach file ( $files )
-  if (-e ../Lens-Zoo/$file) then 
+  if (-e ../Lens-Zoo/$file) then
     sdiff -w 80 -s ../Lens-Zoo/$file $file > junk
     set fail = `cat junk | head -1 | wc -l`
     if ($fail) then
       echo " "
       echo "AHA! $file is different:"
       cat junk
-    endif  
+    endif
   endif
 end
 
@@ -783,7 +783,7 @@ end
 # zooniverse/translations! So why doesnt app run properly?
 
 # Chris suggests running from fresh clone of drphilmarshall/Lens-Zoo. Trying
-# that. Still get require error - fix this by 
+# that. Still get require error - fix this by
 
 npm uninstall hem -g
 
@@ -826,7 +826,7 @@ while ($k < 97)
   set png = "images/guide/lenses/$pngs[$k]"
   set line = "<img class='lazy' src='' data-original='$png' width='154' height='154'>"
   echo $line
-end  
+end
 
 # Then copied and pasted from terminal into app/views/guide.eco.
 
@@ -835,7 +835,7 @@ end
 
 # Hmm - marker placement is wrong (circle appears wiith bottom edge of orange
 # circle on cursor tip). Whats different between live app and our repo?
-# Its not just CFHTLS_stage2 branch - translations branch has it too. 
+# Its not just CFHTLS_stage2 branch - translations branch has it too.
 # What about zooniverse version of translations branch?
 
 # Cloned as Lens-Zoo_zooniverse. Run app...
@@ -846,7 +846,7 @@ end
 # ============================================================================
 # 2014-02-06 (Thursday) 18:21 PST
 
-# OK, make a stage1.1 branch for reingestion of subjects, with explanation 
+# OK, make a stage1.1 branch for reingestion of subjects, with explanation
 # that this is a top-up run.
 
 # Starting server...
@@ -886,10 +886,10 @@ sudo npm install hem@0.2.9 -g
 # gyp ERR! rebuild error     at ChildProcess.onExit (/usr/local/lib/node_modules/npm/node_modules/node-gyp/lib/build.js:214:23)
 # gyp ERR! rebuild error     at ChildProcess.EventEmitter.emit (events.js:91:17)
 # gyp ERR! rebuild error     at Process._handle.onexit (child_process.js:674:10)
-# gyp ERR! not ok 
+# gyp ERR! not ok
 # npm ERR! fsevents@0.1.6 install: `node-gyp rebuild`
 # npm ERR! `sh "-c" "node-gyp rebuild"` failed with 1
-# npm ERR! 
+# npm ERR!
 # npm ERR! Failed at the fsevents@0.1.6 install script.
 # npm ERR! This is most likely a problem with the fsevents package,
 # npm ERR! not with npm itself.
@@ -900,11 +900,11 @@ sudo npm install hem@0.2.9 -g
 
 # ============================================================================
 # 2014-02-13 (Thursday) 19:30 PST
-# 
+#
 # Chris Snyder
 # 11:21 am (1 day ago)
-# 
-# to me 
+#
+# to me
 # I think your version of node is out of date. Try running these commands:
 
 sudo npm install -g n
@@ -927,10 +927,10 @@ hem server --includeCss &
 #                 ^
 # Error: stylus:1
 #  > 1| @import "../node_modules/nib/lib/nib/"
-#    2| 
+#    2|
 #    3| $white       = #FFFFFF
 #    4| $black       = #404040
-# 
+#
 # failed to locate @import file ../node_modules/nib/lib/nib/.styl
 
 

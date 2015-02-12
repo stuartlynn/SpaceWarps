@@ -5,7 +5,7 @@
 #   SWIPE
 #
 # PURPOSE:
-#   Unpack a new SW database, and restore it ready for interrogation. 
+#   Unpack a new SW database, and restore it ready for interrogation.
 #
 # COMMENTS:
 #
@@ -33,15 +33,15 @@ set survey = 'CFHTLS'
 
 while ( $#argv > 0 )
    switch ($argv[1])
-   case -h:        
+   case -h:
       shift argv
       set help = 1
       breaksw
-   case --{help}:        
+   case --{help}:
       shift argv
       set help = 1
       breaksw
-   case *:        
+   case *:
       set dbfile = $argv[1]
       shift argv
       breaksw
@@ -73,7 +73,7 @@ echo "SWIPE: database json and bson files stored in $db"
 echo "SWIPE: killing any mongo server already running"
 set pid = `ps -e | grep 'mongod --dbpath' | \
                    grep -v 'grep' | head -1 | awk '{print $1}'`
-if ($#pid > 0) then 
+if ($#pid > 0) then
     kill $pid
     \rm -rf mongo
 endif
@@ -98,10 +98,10 @@ endif
 
 
 # Now restore the new database:
-echo "SWIPE: mongorestoring into database 'ouroboros_staging'"
+echo "SWIPE: mongorestoring into database 'ouroboros'"
 
 set logfile = .${db}_mongorestore.log
-mongorestore --drop --db ouroboros_staging $db >& $logfile
+mongorestore --drop --db ouroboros $db >& $logfile
 echo "SWIPE: mongorestore log stored in $logfile"
 
 # Did it work?
