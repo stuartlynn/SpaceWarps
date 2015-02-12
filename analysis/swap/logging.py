@@ -4,7 +4,7 @@ import swap
 
 import subprocess,sys,os,time
 import numpy as np
-from subject import Ntrajectory
+
 
 # ======================================================================
 
@@ -14,16 +14,16 @@ from subject import Ntrajectory
 
     PURPOSE
         Bits and pieces to help make a nice output log.
-        
+
     COMMENTS
         Based on https://github.com/drphilmarshall/Pangloss/blob/master/pangloss/miscellaneous.py
-        
+
     FUNCTIONS
-        
+
     BUGS
 
     AUTHORS
-      This file is part of the Space Warps project, and is distributed 
+      This file is part of the Space Warps project, and is distributed
       under the GPL v2 by the Space Warps Science Team.
       http://spacewarps.org/
 
@@ -53,24 +53,24 @@ def write_report(pars,bureau,sample):
     swap.write_report_preamble(F)
 
     # Top left panel holds a summary of numbers.
-    
+
     F.write('\\begin{minipage}{0.42\linewidth}\n')
 
     title = pars['survey'].replace('_',',')
 
     F.write('{\LARGE %s}\\newline\n' % title)
     F.write('\medskip\n\n')
-    
+
     # First, just count things:
 
     sample.take_stock()
-    
+
     bureau.collect_probabilities()
-    
+
     Nmade = np.sum(bureau.Ntotal)
-    Nused = np.sum(sample.exposure['sim'])+np.sum(sample.exposure['dud'])+np.sum(sample.exposure['test'])    
+    Nused = np.sum(sample.exposure['sim'])+np.sum(sample.exposure['dud'])+np.sum(sample.exposure['test'])
     Nc = len(bureau.member)
-    
+
     # Ns = len(sample.member)
     # assert (Ns == sample.N)
     Ns = sample.Ns
@@ -93,7 +93,7 @@ def write_report(pars,bureau,sample):
     F.write('\end{tabular}\n')
 
     # Now, what has the crowd achieved?
-    
+
     Nc_per_classifier = np.average(bureau.Ntest)
     Nc_per_subject    = np.average(sample.exposure['test'])
     Ns_retired = sample.Ns_retired
@@ -116,18 +116,18 @@ def write_report(pars,bureau,sample):
     # training set? First, completeness - lenses out over lenses in:
     C_LENS = 100.0*sample.Ntl_detected/(sample.Ntl + (sample.Ntl == 0))
     C_NOT = 100.0*sample.Ntd_rejected/(sample.Ntd + (sample.Ntd == 0))
-    
+
     # Now purity - lenses out over all output, accounting for population:
-    
+
     Npool = 1.0/swap.prior
     P_LENS = 100.0*(1.0*C_LENS/100.0 + (1.0-C_NOT/100.0)*(Npool - 1))/(Npool)
 
-    # False positive contamination - detected duds as fraction of 
+    # False positive contamination - detected duds as fraction of
     # total detections:
     # FP = 100.0*sample.Ntd_detected/(sample.Nt_detected + (sample.Nt_detected == 0))
     FP = 100.0 - P_LENS
-    
-    # Lenses lost as false negatives - rejected sims as fraction of 
+
+    # Lenses lost as false negatives - rejected sims as fraction of
     # total number of input sims:
     FN = 100.0*sample.Ntl_rejected/(sample.Ntl + (sample.Ntl == 0))
 
@@ -144,9 +144,9 @@ def write_report(pars,bureau,sample):
 
 
     F.write('\end{minipage}\hfill\n')
-    
+
     # Other panels contain figures:
-    
+
     swap.add_report_figures(F,pars)
 
     # Finish off the texfile:
@@ -154,7 +154,7 @@ def write_report(pars,bureau,sample):
     F.close()
 
     # Compile the pdf:
-    
+
     swap.compile_report(tex,pars)
 
     return
@@ -198,11 +198,11 @@ def add_report_figures(F,pars):
     F.write('\\begin{minipage}{0.48\linewidth}\n')
     F.write('\includegraphics[width=\linewidth]{%s}\n' % pars['historiesplot'])
     F.write('\end{minipage}\n')
-    
+
     F.write('\end{minipage}\n')
 
     return
-    
+
 # ----------------------------------------------------------------------
 
 def write_report_ending(F):
@@ -224,23 +224,23 @@ def compile_report(tex,pars):
     # Keep a record of what happens:
     log = stem+'.texlog'
     L = open(log,"w")
-    
+
     # Run pdflatex:
     P = subprocess.Popen(["pdflatex",tex],cwd=pars['dir'],stdout=L,stderr=L)
-    
+
     # Wait for it to finish:
     for t in range(10):
         time.sleep(1)
         if P.poll() is not None: continue
-    
+
     # If pdflatex has not finished - kill it.
     if P.poll() is None: P.terminate()
-    
-    L.close()    
-    
+
+    L.close()
+
     # Check the PDF got made:
-    
-    if os.path.exists(pdf): 
+
+    if os.path.exists(pdf):
         print "SWAP: report compiled as "+pdf
     else:
         print "SWAP: pdflatex failed, here's the end of the report:"
@@ -254,7 +254,7 @@ def compile_report(tex,pars):
 # ----------------------------------------------------------------------
 
 def set_cookie(go):
-    
+
     F = open('.swap.cookie','w')
     if go:
         F.write('running')
@@ -269,5 +269,5 @@ def set_cookie(go):
 if __name__ == '__main__':
 
     pass
-    
+
 #=======================================================================

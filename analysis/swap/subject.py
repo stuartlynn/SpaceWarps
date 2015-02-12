@@ -8,9 +8,9 @@ import pylab as plt
 # Every subject starts with the following probability of being a LENS:
 prior = 2e-4
 
-# Every subject starts 50 trajectories. This will slow down the code,
+# Every subject samples 50 realizations of itself. This will slow down the code,
 # but its ok, we can always parallelize
-Ntrajectory=50
+# Nrealizations = 50
 # This should really be a user-supplied constant, in the configuration.
 
 # ======================================================================
@@ -85,7 +85,7 @@ class Subject(object):
 
 # ----------------------------------------------------------------------
 
-    def __init__(self,ID,ZooID,category,kind,flavor,truth,thresholds,location):
+    def __init__(self,ID,ZooID,category,kind,flavor,truth,thresholds,location,Nrealizations):
 
         self.ID = ID
         self.ZooID = ZooID
@@ -93,6 +93,7 @@ class Subject(object):
         self.kind = kind
         self.flavor = flavor
         self.truth = truth
+        self.Nrealizations = Nrealizations
 
         self.state = 'active'
         self.status = 'undecided'
@@ -100,10 +101,18 @@ class Subject(object):
         self.retirement_time = 'not yet'
         self.retirement_age = 0.0
 
-        self.probability = np.zeros(Ntrajectory)+prior
+        if self.Nrealizations > 0:
+            self.probability = np.zeros(self.Nrealizations)+prior
+        else:
+            self.probability = np.array([prior])
+
         self.mean_probability = prior
         self.median_probability = prior
-        self.trajectory = np.zeros(Ntrajectory)+self.probability;
+        if self.Nrealizations > 0:
+            self.trajectory = np.zeros(self.Nrealizations)+self.probability;
+        else:
+            self.trajectory = self.probability
+
         self.exposure = 0
 
         self.detection_threshold = thresholds['detection']
@@ -124,8 +133,8 @@ class Subject(object):
 
     def __str__(self):
         # Calculate the mean probability and the error on it
-        mean_logp =sum(np.log(self.probability))/Ntrajectory
-        error_logp=sum((np.log(self.probability)-mean_logp)**2/Ntrajectory)
+        mean_logp =sum(np.log(self.probability))/self.Nrealizations
+        error_logp=sum((np.log(self.probability)-mean_logp)**2/self.Nrealizations)
         return 'individual (%s) subject, ID %s, Pr(LENS|d) = %.2f \pm %.2f' % \
                (self.kind,self.ID,exp(mean_logp),exp(mean_logp)*error_logp)
 
@@ -168,12 +177,12 @@ class Subject(object):
         # Deal with active subjects. Ignore the classifier until they
         # have seen NT > a_few_at_the_start (ie they've had a
         # certain amount of training - at least one training image, for example):
-            
+
             if by.NT > a_few_at_the_start:
-               
-                # Calculate likelihood for all Ntrajectory trajectories, generating as many binomial deviates
-                PL_realization=by.get_PL_realization(Ntrajectory);
-                PD_realization=by.get_PD_realization(Ntrajectory);
+
+                # Calculate likelihood for all self.Nrealizations trajectories, generating as many binomial deviates
+                PL_realization=by.get_PL_realization(self.Nrealizations);
+                PD_realization=by.get_PD_realization(self.Nrealizations);
                 prior_probability=self.probability*1.0;
 
                 if as_being == 'LENS':
@@ -201,8 +210,12 @@ class Subject(object):
                 self.exposure += 1
 
                 # Update median probability
-                self.mean_probability=10.0**(sum(np.log10(self.probability))/Ntrajectory)
-                self.median_probability=np.sort(self.probability)[Ntrajectory/2]
+                if self.Nrealizations > 0 :
+                    self.mean_probability=10.0**(sum(np.log10(self.probability))/(self.Nrealizations))
+                    self.median_probability=np.sort(self.probability)[self.Nrealizations/2]
+                else:
+                    self.mean_probability = self.probability
+                    self.median_probability = self.probability
 
                 # Should we count it as a detection, or a rejection?
                 # Only test subjects get de-activated:
@@ -232,7 +245,7 @@ class Subject(object):
                         self.retirement_time = 'not yet'
                         self.retirement_age = 0.0
 
-                # Update agent - training history is taken care of in agent.heard(), 
+                # Update agent - training history is taken care of in agent.heard(),
                 # which also keeps agent.skill up to date.
                 if self.kind == 'test':
 
@@ -264,18 +277,28 @@ class Subject(object):
     def plot_trajectory(self,axes,highlight=False):
 
         plt.sca(axes[0])
-        N = np.linspace(0, len(self.trajectory)/Ntrajectory+1, len(self.trajectory)/Ntrajectory, endpoint=True);
+        if self.Nrealizations > 0:
+            NN = len(self.trajectory)/self.Nrealizations
+        else:
+            NN = len(self.trajectory)
+
+        N = np.linspace(0, NN+1, NN, endpoint=True);
         N[0] = 0.5
         mdn_trajectory=np.array([]);
         sigma_trajectory_m=np.array([]);
         sigma_trajectory_p=np.array([]);
-        for i in range(len(N)):
-	    sorted_arr=np.sort(self.trajectory[i*Ntrajectory:(i+1)*Ntrajectory])
-            sigma_p=sorted_arr[int(0.84*Ntrajectory)]-sorted_arr[int(0.50*Ntrajectory)]
-            sigma_m=sorted_arr[int(0.50*Ntrajectory)]-sorted_arr[int(0.16*Ntrajectory)]
-            mdn_trajectory=np.append(mdn_trajectory,sorted_arr[int(0.50*Ntrajectory)]);
-            sigma_trajectory_p=np.append(sigma_trajectory_p,sigma_p);
-            sigma_trajectory_m=np.append(sigma_trajectory_m,sigma_m);
+        if self.Nrealizations > 0:
+            for i in range(len(N)):
+    	        sorted_arr=np.sort(self.trajectory[i*self.Nrealizations:(i+1)*self.Nrealizations])
+                sigma_p=sorted_arr[int(0.84*self.Nrealizations)]-sorted_arr[int(0.50*self.Nrealizations)]
+                sigma_m=sorted_arr[int(0.50*self.Nrealizations)]-sorted_arr[int(0.16*self.Nrealizations)]
+                mdn_trajectory=np.append(mdn_trajectory,sorted_arr[int(0.50*self.Nrealizations)]);
+                sigma_trajectory_p=np.append(sigma_trajectory_p,sigma_p);
+                sigma_trajectory_m=np.append(sigma_trajectory_m,sigma_m);
+        else:
+            mdn_trajectory     = self.trajectory
+            sigma_trajectory_p = self.trajectory*0
+            sigma_trajectory_m = self.trajectory*0
 
         if self.kind == 'sim':
             colour = 'blue'
@@ -306,9 +329,9 @@ class Subject(object):
             # Fainter symbol:
             plt.scatter(mdn_trajectory[-1], NN, edgecolors=colour, facecolors=facecolour, alpha=0.5);
             plt.plot([mdn_trajectory[-1]-sigma_trajectory_m[-1],mdn_trajectory[-1]+sigma_trajectory_p[-1]],[NN,NN],color=colour,alpha=0.3);
-        
-        
-        
+
+
+
         # if self.kind == 'sim': print self.trajectory[-1], N[-1]
 
         return

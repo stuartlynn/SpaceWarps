@@ -134,7 +134,7 @@ class Agent(object):
             pass
 
         else:
-                        
+
             if actually_it_was=='LENS':
                 if not ignore:
                     self.PL = (self.PL*self.NL + (it_was==actually_it_was))/(1+self.NL)
@@ -185,8 +185,8 @@ class Agent(object):
                         self.PD = np.max([self.PD,swap.PDmin])
                     self.ND += (1.0 - increment)
 
-                # self.NT += 1 # Don't count test images as training images?! 
-                # self.NT == 0 if unsupervised? Not sure. Maybe better to count every image 
+                # self.NT += 1 # Don't count test images as training images?!
+                # self.NT == 0 if unsupervised? Not sure. Maybe better to count every image
                 # as training when unsupervised... Bit odd though.
                 self.NT += 1
 
@@ -223,28 +223,34 @@ class Agent(object):
 # Get a realization for agent's PL distribution
 
     def get_PL_realization(self,Ntrajectory):
-        NL_correct=self.PL*self.NL;
-        NL_correct_realize=np.random.binomial(self.NL,self.PL,size=Ntrajectory);
-        PL_realize=(NL_correct_realize*1.0)/(self.NL);
-        idx=np.where(PL_realize>swap.PLmax);
-        PL_realize[idx]=swap.PLmax;
-        idx=np.where(PL_realize<swap.PLmin);
-        PL_realize[idx]=swap.PLmin;
-        #print NL_correct,NL_correct_realize,PL_realize
+        if Ntrajectory > 0:
+            NL_correct=self.PL*self.NL;
+            NL_correct_realize=np.random.binomial(self.NL,self.PL,size=Ntrajectory);
+            PL_realize=(NL_correct_realize*1.0)/(self.NL);
+            idx=np.where(PL_realize>swap.PLmax);
+            PL_realize[idx]=swap.PLmax;
+            idx=np.where(PL_realize<swap.PLmin);
+            PL_realize[idx]=swap.PLmin;
+            #print NL_correct,NL_correct_realize,PL_realize
+        else:
+            PL_realize = self.PL
         return PL_realize;
 
 # ----------------------------------------------------------------------
 # Get a realization for agent's PD distribution
 
     def get_PD_realization(self,Ntrajectory):
-        ND_correct=self.PD*self.ND;
-        ND_correct_realize=np.random.binomial(self.ND,self.PD,size=Ntrajectory);
-        PD_realize=(ND_correct_realize*1.0)/(self.ND);
-        idx=np.where(PD_realize>swap.PDmax);
-        PD_realize[idx]=swap.PDmax;
-        idx=np.where(PD_realize<swap.PDmin);
-        PD_realize[idx]=swap.PDmin;
-        #print  ND_correct,ND_correct_realize,PD_realize
+        if Ntrajectory > 0:
+            ND_correct=self.PD*self.ND;
+            ND_correct_realize=np.random.binomial(self.ND,self.PD,size=Ntrajectory);
+            PD_realize=(ND_correct_realize*1.0)/(self.ND);
+            idx=np.where(PD_realize>swap.PDmax);
+            PD_realize[idx]=swap.PDmax;
+            idx=np.where(PD_realize<swap.PDmin);
+            PD_realize[idx]=swap.PDmin;
+            #print  ND_correct,ND_correct_realize,PD_realize
+        else:
+            PD_realize = self.PD
         return PD_realize;
 
 # ======================================================================

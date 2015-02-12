@@ -1,8 +1,3 @@
-"""
-TODO:
-    Save the list of clicks!
-"""
-
 #!/usr/bin/env python
 # ======================================================================
 
@@ -111,11 +106,16 @@ def SWAP(argv):
 
     tonights = swap.Configuration(configfile)
 
-    # Read the pickled random state file
-    random_file = open(tonights.parameters['random_file'],"r");
-    random_state = cPickle.load(random_file);
-    random_file.close();
+    # Read the pickled random state file, if it exists - otherwise,
+    # just get a state (from the system clock?)
+    try:
+        random_file = open(tonights.parameters['random_file'],"r");
+        random_state = cPickle.load(random_file);
+        random_file.close();
+    except:
+        random_state = np.random.get_state()
     np.random.set_state(random_state);
+
 
     practise = (tonights.parameters['dbspecies'] == 'Toy')
     if practise:
@@ -145,7 +145,7 @@ def SWAP(argv):
             print "SWAP: agents will only use test data to update their confusion matrices"
 
         a_few_at_the_start = tonights.parameters['a_few_at_the_start']
-        if a_few_at_the_start > 0: 
+        if a_few_at_the_start > 0:
             print "SWAP: but at first they'll ignore their volunteer until "
             print "SWAP: they've done ",int(a_few_at_the_start)," images"
 
@@ -230,6 +230,10 @@ def SWAP(argv):
     thresholds = {}
     thresholds['detection'] = tonights.parameters['detection_threshold']
     thresholds['rejection'] = tonights.parameters['rejection_threshold']
+
+    # How carefully shall we include the uncertainty (by drawing multiple binomial
+    # samples each time we update a subject)?
+    Nrealizations = tonights.parameters['Nrealizations']
 
     # ------------------------------------------------------------------
     # Read in, or create, a bureau of agents who will represent the
@@ -325,7 +329,7 @@ def SWAP(argv):
         # Register newly-classified subjects:
         # Old, slow code: if ID not in sample.list():
         try: test = sample.member[ID]
-        except: sample.member[ID] = swap.Subject(ID,ZooID,category,kind,flavor,Y,thresholds,location)
+        except: sample.member[ID] = swap.Subject(ID,ZooID,category,kind,flavor,Y,thresholds,location,Nrealizations)
 
         # Update the subject's lens probability using input from the
         # classifier. We send that classifier's agent to the subject
@@ -333,9 +337,9 @@ def SWAP(argv):
         sample.member[ID].was_described(by=bureau.member[Name],as_being=X,at_time=tstring,while_ignoring=a_few_at_the_start,haste=waste,at_x=at_x,at_y=at_y)
 
         # Update the agent's confusion matrix, based on what it heard:
-        
+
         P = sample.member[ID].mean_probability
-        
+
         if supervised_and_unsupervised:
             # use both training and test images
             if agents_willing_to_learn * ((category == 'test') + (category == 'training')):
@@ -343,13 +347,13 @@ def SWAP(argv):
             elif ((category == 'test') + (category == 'training')):
                 bureau.member[Name].heard(it_was=X,actually_it_was=Y,with_probability=P,ignore=True)
         elif supervised:
-            # Only use training images!                
+            # Only use training images!
             if category == 'training' and agents_willing_to_learn:
                 bureau.member[Name].heard(it_was=X,actually_it_was=Y,with_probability=P,ignore=False)
             elif category == 'training':
                 bureau.member[Name].heard(it_was=X,actually_it_was=Y,with_probability=P,ignore=True)
         else:
-            # Unsupervised: ignore all the training images...                
+            # Unsupervised: ignore all the training images...
             if category == 'test' and agents_willing_to_learn:
                 bureau.member[Name].heard(it_was=X,actually_it_was=Y,with_probability=P,ignore=False)
             elif category == 'test':
